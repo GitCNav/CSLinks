@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Play, Star, Clock, CheckCircle, Pause, XCircle, LogOut, Shield, TrendingUp, Film, Tv } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
 interface AnimeSource {
   id: string;
   name: string;
@@ -18,7 +17,6 @@ interface AnimeSource {
   language: string;
   is_active: boolean;
 }
-
 interface UserAnime {
   id: string;
   anime_id: number;
@@ -27,37 +25,54 @@ interface UserAnime {
   score: number | null;
   notes: string | null;
 }
-
 const statusConfig = {
-  watching: { label: 'En cours', icon: Play, color: 'bg-blue-500' },
-  completed: { label: 'Terminé', icon: CheckCircle, color: 'bg-green-500' },
-  plan_to_watch: { label: 'À voir', icon: Clock, color: 'bg-yellow-500' },
-  on_hold: { label: 'En pause', icon: Pause, color: 'bg-orange-500' },
-  dropped: { label: 'Abandonné', icon: XCircle, color: 'bg-red-500' },
+  watching: {
+    label: 'En cours',
+    icon: Play,
+    color: 'bg-blue-500'
+  },
+  completed: {
+    label: 'Terminé',
+    icon: CheckCircle,
+    color: 'bg-green-500'
+  },
+  plan_to_watch: {
+    label: 'À voir',
+    icon: Clock,
+    color: 'bg-yellow-500'
+  },
+  on_hold: {
+    label: 'En pause',
+    icon: Pause,
+    color: 'bg-orange-500'
+  },
+  dropped: {
+    label: 'Abandonné',
+    icon: XCircle,
+    color: 'bg-red-500'
+  }
 };
-
 const Dashboard = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const {
+    user,
+    isAdmin,
+    signOut
+  } = useAuth();
   const navigate = useNavigate();
   const [sources, setSources] = useState<AnimeSource[]>([]);
   const [userAnimes, setUserAnimes] = useState<UserAnime[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     setLoading(true);
-    
+
     // Fetch anime sources
-    const { data: sourcesData } = await supabase
-      .from('readers')
-      .select('*')
-      .eq('enabled', true)
-      .limit(20);
-    
+    const {
+      data: sourcesData
+    } = await supabase.from('readers').select('*').eq('enabled', true).limit(20);
     if (sourcesData) {
       setSources(sourcesData.map(s => ({
         id: s.id,
@@ -71,11 +86,9 @@ const Dashboard = () => {
 
     // Fetch user anime list
     if (user) {
-      const { data: animesData } = await supabase
-        .from('watchlist')
-        .select('*')
-        .eq('user_id', user.id);
-      
+      const {
+        data: animesData
+      } = await supabase.from('watchlist').select('*').eq('user_id', user.id);
       if (animesData) {
         setUserAnimes(animesData.map(a => ({
           id: a.id,
@@ -87,28 +100,20 @@ const Dashboard = () => {
         })));
       }
     }
-    
     setLoading(false);
   };
-
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
   };
-
   const stats = {
     total: userAnimes.length,
     watching: userAnimes.filter(a => a.status === 'watching').length,
     completed: userAnimes.filter(a => a.status === 'completed').length,
-    planToWatch: userAnimes.filter(a => a.status === 'plan_to_watch').length,
+    planToWatch: userAnimes.filter(a => a.status === 'plan_to_watch').length
   };
-
-  const filteredSources = sources.filter(s => 
-    s.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <div className="min-h-screen bg-background">
+  const filteredSources = sources.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -116,16 +121,14 @@ const Dashboard = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
               <Play className="w-5 h-5 text-primary-foreground" />
             </div>
-            <h1 className="text-xl font-bold">AniTracker</h1>
+            <h1 className="text-xl font-bold">CSLink</h1>
           </div>
           
           <div className="flex items-center gap-3">
-            {isAdmin && (
-              <Button variant="outline" size="sm" onClick={() => navigate('/admin')}>
+            {isAdmin && <Button variant="outline" size="sm" onClick={() => navigate('/admin')}>
                 <Shield className="w-4 h-4 mr-2" />
                 Admin
-              </Button>
-            )}
+              </Button>}
             <span className="text-sm text-muted-foreground hidden sm:block">
               {user?.email}
             </span>
@@ -202,28 +205,19 @@ const Dashboard = () => {
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher une source..."
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                <Input placeholder="Rechercher une source..." className="pl-10" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
               </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {loading ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <Card key={i} className="animate-pulse">
+              {loading ? Array.from({
+              length: 6
+            }).map((_, i) => <Card key={i} className="animate-pulse">
                     <CardContent className="pt-6">
                       <div className="h-4 bg-muted rounded w-3/4 mb-2" />
                       <div className="h-3 bg-muted rounded w-1/2" />
                     </CardContent>
-                  </Card>
-                ))
-              ) : filteredSources.length > 0 ? (
-                filteredSources.map((source) => (
-                  <Card key={source.id} className="hover:border-primary/50 transition-colors cursor-pointer group">
+                  </Card>) : filteredSources.length > 0 ? filteredSources.map(source => <Card key={source.id} className="hover:border-primary/50 transition-colors cursor-pointer group">
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">
                         <CardTitle className="text-lg group-hover:text-primary transition-colors">
@@ -236,33 +230,23 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline">{source.type}</Badge>
-                        <Button 
-                          size="sm" 
-                          className="ml-auto"
-                          onClick={() => window.open(source.url, '_blank')}
-                        >
+                        <Button size="sm" className="ml-auto" onClick={() => window.open(source.url, '_blank')}>
                           <Play className="w-3 h-3 mr-1" />
                           Regarder
                         </Button>
                       </div>
                     </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <Card className="col-span-full">
+                  </Card>) : <Card className="col-span-full">
                   <CardContent className="pt-6 text-center text-muted-foreground">
                     Aucune source trouvée
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
             </div>
           </TabsContent>
 
           <TabsContent value="mylist" className="space-y-4">
             <div className="grid gap-4">
-              {userAnimes.length > 0 ? (
-                userAnimes.map((anime) => (
-                  <Card key={anime.id}>
+              {userAnimes.length > 0 ? userAnimes.map(anime => <Card key={anime.id}>
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div>
@@ -271,12 +255,10 @@ const Dashboard = () => {
                             <Badge className={statusConfig[anime.status as keyof typeof statusConfig]?.color}>
                               {statusConfig[anime.status as keyof typeof statusConfig]?.label}
                             </Badge>
-                            {anime.score && (
-                              <span className="flex items-center text-sm text-muted-foreground">
+                            {anime.score && <span className="flex items-center text-sm text-muted-foreground">
                                 <Star className="w-3 h-3 mr-1 fill-yellow-500 text-yellow-500" />
                                 {anime.score}/10
-                              </span>
-                            )}
+                              </span>}
                           </div>
                         </div>
                         <span className="text-sm text-muted-foreground">
@@ -284,22 +266,16 @@ const Dashboard = () => {
                         </span>
                       </div>
                     </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <Card>
+                  </Card>) : <Card>
                   <CardContent className="pt-6 text-center text-muted-foreground">
                     <p>Votre liste est vide</p>
                     <p className="text-sm mt-1">Ajoutez des animes depuis les sources</p>
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
             </div>
           </TabsContent>
         </Tabs>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
