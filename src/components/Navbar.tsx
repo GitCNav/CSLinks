@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bell, Settings, User, LogOut, Shield, Menu, X, Film, Tv, Play, Users } from 'lucide-react';
+import { Bell, Settings, User, LogOut, Shield, Menu, X, Film, Tv, Play, Users, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NotificationsPanel } from './NotificationsPanel';
 
@@ -112,6 +112,10 @@ export const Navbar = () => {
                         </p>
                       </div>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/app')}>
+                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/profile')}>
                         <User className="w-4 h-4 mr-2" />
                         Profil
