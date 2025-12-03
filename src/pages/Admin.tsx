@@ -65,7 +65,7 @@ const Admin = () => {
       setReaders(readersData ?? []);
       setUsers(usersData ?? []);
     } catch (err: any) {
-      toast.error(`Erreur lors du chargement: ${err.message}`);
+      toast.error(`Erreur lors du chargement: ${err?.message ?? JSON.stringify(err)}`);
     } finally {
       setLoading(false);
     }
@@ -102,12 +102,14 @@ const Admin = () => {
 
       if (error) throw error;
 
-      setReaders((prev) => [data, ...prev]);
-      toast.success('Source ajoutée avec succès');
-      setDialogOpen(false);
-      resetForm();
+      if (data) {
+        setReaders((prev) => [data, ...prev]);
+        toast.success('Source ajoutée avec succès');
+        setDialogOpen(false);
+        resetForm();
+      }
     } catch (err: any) {
-      toast.error(`Erreur lors de l'ajout: ${err.message}`);
+      toast.error(`Erreur lors de l'ajout: ${err?.message ?? JSON.stringify(err)}`);
     } finally {
       setSaving(false);
     }
@@ -134,7 +136,7 @@ const Admin = () => {
       setEditingReader(null);
       resetForm();
     } catch (err: any) {
-      toast.error(`Erreur lors de la mise à jour: ${err.message}`);
+      toast.error(`Erreur lors de la mise à jour: ${err?.message ?? JSON.stringify(err)}`);
     } finally {
       setSaving(false);
     }
@@ -151,7 +153,7 @@ const Admin = () => {
       setReaders((prev) => prev.filter((r) => r.id !== id));
       toast.success('Source supprimée');
     } catch (err: any) {
-      toast.error(`Erreur lors de la suppression: ${err.message}`);
+      toast.error(`Erreur lors de la suppression: ${err?.message ?? JSON.stringify(err)}`);
     }
   };
 
@@ -162,8 +164,8 @@ const Admin = () => {
       if (error) throw error;
 
       setReaders((prev) => prev.map((r) => (r.id === id ? { ...r, enabled } : r)));
-    } catch {
-      toast.error('Erreur lors de la mise à jour du statut');
+    } catch (err: any) {
+      toast.error(`Erreur lors de la mise à jour du statut: ${err?.message ?? JSON.stringify(err)}`);
     }
   };
 
@@ -213,4 +215,11 @@ const Admin = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card><CardContent className="pt-6"><p>Sources</p><p className="text-2xl
+          <Card><CardContent className="pt-6"><p>Sources</p><p className="text-2xl font-bold">{stats.total}</p></CardContent></Card>
+          <Card><CardContent className="pt-6"><p>Utilisateurs</p><p className="text-2xl font-bold">{stats.users}</p></CardContent></Card>
+          <Card><CardContent className="pt-6"><p>Actives</p><p className="text-2xl font-bold">{stats.active}</p></CardContent></Card>
+          <Card><CardContent className="pt-6"><p>Désactivées</p><p className="text-2xl font-bold">{stats.inactive}</p></CardContent></Card>
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="sources" className
